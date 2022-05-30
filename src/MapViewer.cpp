@@ -180,6 +180,46 @@ void MapViewer::keyPressEvent(QKeyEvent *event)
     };
 }
 
+void MapViewer::wheelEvent(QWheelEvent* event)
+{
+    const QSize& size = m_render_state.mapSize();
+    //m_map_center += (event->pos() - QPoint(size.width() / 2, size.height() / 2));
+    QPoint mouse_center_diff = event->pos() - QPoint(size.width()/2,size.height()/2);
+    QPoint mouse_map_pos = m_map_center + mouse_center_diff;
+
+    // Here a left button double click zoom in, a right button zooms out
+    if (event->delta() > 0) {
+        // Zoom in
+        m_render_state.setZoom(std::min(m_render_state.zoom() + 1, m_config.max_zoom));
+        if (m_render_state.zoomedIn()) {
+            // only scale the map center coordinate if we zoomed in
+            //m_map_center = QPoint(m_map_center.x() * 2, m_map_center.y() * 2);
+            m_map_center = QPoint(mouse_map_pos.x() * 2, mouse_map_pos.y() * 2) - mouse_center_diff;
+        }
+    }
+    else if (event->delta() < 0) {
+        // Zoom out
+        m_render_state.setZoom(std::max(m_render_state.zoom() - 1, m_config.min_zoom));
+        if (m_render_state.zoomedOut()) {
+            // only scale the map center coordinate if we zoomed out
+            //m_map_center = QPoint(m_map_center.x() / 2, m_map_center.y() / 2);
+            m_map_center = QPoint(mouse_map_pos.x() / 2, mouse_map_pos.y() / 2) - mouse_center_diff;
+        }
+    }
+    // emit a signal to cancel outstanding tile requests since we are moving to a new
+    // zoom level in the map. This allows the network layer to immediately start 
+    // downloading map tiles for the current level.
+    emit cancelRequests();
+
+    // A zoom operation changes the map center in pixel coordinates because the 
+    // center is defined within the pixel spae of a specific zoom level
+    QRect bounds(m_map_center.x() - size.width() / 2,
+        m_map_center.y() - size.height() / 2, size.width(), size.height());
+
+    m_render_state.setBounds(bounds);
+    m_renderer->setState(m_render_state);
+}
+
 void MapViewer::exposeEvent(QExposeEvent *event)
 {
     Q_UNUSED(event);

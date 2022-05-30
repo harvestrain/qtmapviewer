@@ -32,6 +32,7 @@ protected:
     void mouseReleaseEvent(QMouseEvent *event); 
     void mouseDoubleClickEvent(QMouseEvent *event); 
     void keyPressEvent(QKeyEvent *event);
+    void wheelEvent(QWheelEvent *event) override;
 
 signals:
     void cancelRequests();
