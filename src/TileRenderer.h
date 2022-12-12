@@ -70,6 +70,7 @@ public:
 
 public slots:
     void tileResponse(TileImage* tile);
+    void tileResponse(const TileIndex& index, QByteArray image_data);
 
 signals:
     void requestTile(const TileIndex& tile);

@@ -19,10 +19,12 @@ TileFetcher::TileFetcher(const MapConfig& config, const TileRenderer& renderer)
 void TileFetcher::tileRequest(const TileIndex& tile)
 {
     // Create the tile URL as the standard <server>/<zoom>/<x>/<y>.<format>
-    QUrl url(m_config.server +
+    /*QUrl url(m_config.server +
              QString::number(tile.zoom()) + QString("/") +
              QString::number(tile.x()) + QString("/") +
-             QString::number(tile.y()) + QString(".") + m_config.format);
+             QString::number(tile.y()) + QString(".") + m_config.format);*/
+    QString url_text = m_config.server.arg(tile.x()).arg(tile.y()).arg(tile.zoom());
+    QUrl url(url_text);
 
     QNetworkRequest request;
     // many map servers require a valid User-Agent header, so we 
@@ -61,21 +63,23 @@ void TileFetcher::loadTile(QNetworkReply* reply)
                 << reply->request().url() << reply->error();
         }
     } else {
-        QImage image;
-        // Load the image directly from the reply payload bytes
-        image.loadFromData(reply->readAll(), m_config.format.toLocal8Bit().data());
-        assert(image.width() == m_config.tile_size);
-        assert(image.height() == m_config.tile_size);
+        //QImage image;
+        //// Load the image directly from the reply payload bytes
+        //image.loadFromData(reply->readAll(), m_config.format.toLocal8Bit().data());
+        //assert(image.width() == m_config.tile_size);
+        //assert(image.height() == m_config.tile_size);
 
-        tile = new TileImage(index, image);
-        m_images[index] = tile;
+		/*tile = new TileImage(index, image);
+		m_images[index] = tile;*/
     }
     // emit the tile to the TileRenderer
-    emit responseTile(tile);
+    //emit responseTile(tile);
+    emit responseTile(index, reply->readAll());
 }
 
 void TileFetcher::deleteTile(TileImage* tile)
 {
+#if 0
     assert(tile);
     TileImageMap::iterator it = m_images.find(tile->index());
 
@@ -84,6 +88,7 @@ void TileFetcher::deleteTile(TileImage* tile)
     // first remove the tile image from the image map
     m_images.erase(it);
     delete tile;
+#endif
 }
 
 void TileFetcher::shutdown()

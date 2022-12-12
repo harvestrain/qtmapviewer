@@ -49,6 +49,7 @@ public:
     }
 private:
     friend class TileFetcher;
+    friend class TileRenderer;
 
     TileImage(const TileIndex& index)
         : m_index(index), 

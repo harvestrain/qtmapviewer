@@ -131,6 +131,24 @@ void TileRenderer::setState(const State& state) {
     m_mutex.unlock();
 }
 
+void TileRenderer::tileResponse(const TileIndex& index, QByteArray image_data)
+{
+	m_requests.erase(index);
+
+	if (!image_data.isNull()) {
+        QImage image;
+        image.loadFromData(image_data);
+        TileImage* tile_image = new TileImage(index, image);
+		m_cache.insert(index, tile_image);
+		m_mutex.lock();
+		if (!m_render_requests) {
+			m_render_requests++;
+			QCoreApplication::postEvent(this, new TileRenderer::RenderRequest());
+		}
+		m_mutex.unlock();
+	}
+}
+
 TileRenderer::State TileRenderer::getState() {
     State state;
     m_mutex.lock();

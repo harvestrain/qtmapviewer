@@ -65,6 +65,8 @@ void MapViewer::initialize()
         // connect the tile fetcher response signal to the tile renderer reposnse slot
         connect(m_fetcher, SIGNAL(responseTile(TileImage*)), 
             m_renderer, SLOT(tileResponse(TileImage*)));
+		connect(m_fetcher, SIGNAL(responseTile(const TileIndex&,QByteArray)),
+			m_renderer, SLOT(tileResponse(const TileIndex&, QByteArray)));
         // connect the signal to cancel outstanding tile requests to the fetcher slot
         connect(this, SIGNAL(cancelRequests()), m_fetcher, SIGNAL(cancelRequests()));
         // connect the renderer delete tile signal to the tile fetcher slot

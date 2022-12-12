@@ -94,10 +94,12 @@ int main(int argc, char **argv)
     // Default onfiguration for the map viewer.
     // See http://wiki.openstreetmap.org/wiki/Slippy_map_tilenames for a list
     // of config options for servers and zoom levels.
-    config.server = "http://a.tile.openstreetmap.org/";
+    //config.server = "http://a.tile.openstreetmap.org/";
+    //http://wprd03.is.autonavi.com/appmaptile?style=6&x=26705&y=14226&z=15
+    config.server = "http://wprd03.is.autonavi.com/appmaptile?style=7&x=%1&y=%2&z=%3";
     config.format = QString("png");
     // San Francisco, CA :)
-    config.center = QVector2D(-122.20877392578124f, 37.65175620758778f);
+    config.center = QVector2D(122.20877392578124f, 37.65175620758778f);
     config.min_zoom = 0;
     config.max_zoom = 19; // max for most servers
     config.zoom_level = 10;

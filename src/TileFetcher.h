@@ -23,7 +23,8 @@ public slots:
     void deleteTile(TileImage* tile);
 
 signals:
-    void responseTile(TileImage* tile);
+	void responseTile(TileImage* tile);
+	void responseTile(const TileIndex& index, QByteArray image_data);
     void cancelRequests();
 
 protected:
