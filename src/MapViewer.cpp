@@ -228,6 +228,15 @@ void MapViewer::wheelEvent(QWheelEvent* event)
 
     // A zoom operation changes the map center in pixel coordinates because the 
     // center is defined within the pixel spae of a specific zoom level
+    
+    QPoint n_lmt = latlonToPixel(m_render_state.zoom(), QVector2D(0, 80));
+    QPoint s_lmt = latlonToPixel(m_render_state.zoom(), QVector2D(0, -80));
+    int half_height = height() / 2;
+    if (m_map_center.y() - half_height < n_lmt.y())
+        m_map_center.setY(n_lmt.y() + half_height);
+    else if (m_map_center.y() + half_height > s_lmt.y())
+        m_map_center.setY(s_lmt.y() - half_height);
+    
     QRect bounds(m_map_center.x() - size.width() / 2,
         m_map_center.y() - size.height() / 2, size.width(), size.height());
 
