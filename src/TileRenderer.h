@@ -34,6 +34,7 @@ public:
                 m_last_zoom = m_zoom;
             }
             m_zoom = zoom;
+            m_zoom = m_zoom < 3 ? 3 : m_zoom;
         }
         void setMapSize(const QSize& size) {
             m_map_size = size;

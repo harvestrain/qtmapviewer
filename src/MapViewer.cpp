@@ -118,8 +118,21 @@ void MapViewer::mouseMoveEvent(QMouseEvent * event)
        // This is done by computing the pixel offset vector and adding it
        // to the map center coordinate. We then recompute the map bounds in
        // pixel space and update the render state with the new values.
+
+       QPoint n_lmt = latlonToPixel(m_render_state.zoom(), QVector2D(0, 80));
+       QPoint s_lmt = latlonToPixel(m_render_state.zoom(), QVector2D(0, -80));
+       int half_height = height() / 2;
        QPoint diff = m_mouse_anchor - event->pos();
-       m_map_center += diff;
+
+       bool limit_y = false;
+       
+       if (m_map_center.y() - half_height < n_lmt.y() && diff.y() < 0 || m_map_center.y() + half_height > s_lmt.y() && diff.y() > 0)
+           limit_y = true;
+
+       if (limit_y)
+           m_map_center.setX(m_map_center.x() + diff.x());
+       else
+           m_map_center += diff;
        m_mouse_anchor = event->pos();
 
        const QSize& size = m_render_state.mapSize();
@@ -141,37 +154,37 @@ void MapViewer::mouseReleaseEvent(QMouseEvent * event)
 
 void MapViewer::mouseDoubleClickEvent(QMouseEvent * event)
 {
-    const QSize& size = m_render_state.mapSize();
-    m_map_center += (event->pos() - QPoint(size.width() / 2, size.height() / 2));
+    //const QSize& size = m_render_state.mapSize();
+    //m_map_center += (event->pos() - QPoint(size.width() / 2, size.height() / 2));
 
-    // Here a left button double click zoom in, a right button zooms out
-    if (event->buttons() & Qt::LeftButton) {
-        // Zoom in
-        m_render_state.setZoom(std::min(m_render_state.zoom() + 1, m_config.max_zoom));
-        if (m_render_state.zoomedIn()) {
-            // only scale the map center coordinate if we zoomed in
-            m_map_center = QPoint(m_map_center.x() * 2, m_map_center.y() * 2);
-        }
-    } else if (event->buttons() & Qt::RightButton) {
-        // Zoom out
-        m_render_state.setZoom(std::max(m_render_state.zoom() - 1, m_config.min_zoom));
-        if (m_render_state.zoomedOut()) {
-            // only scale the map center coordinate if we zoomed out
-            m_map_center = QPoint(m_map_center.x() / 2, m_map_center.y() / 2);
-        }
-    }
-    // emit a signal to cancel outstanding tile requests since we are moving to a new
-    // zoom level in the map. This allows the network layer to immediately start 
-    // downloading map tiles for the current level.
-    emit cancelRequests();
+    //// Here a left button double click zoom in, a right button zooms out
+    //if (event->buttons() & Qt::LeftButton) {
+    //    // Zoom in
+    //    m_render_state.setZoom(std::min(m_render_state.zoom() + 1, m_config.max_zoom));
+    //    if (m_render_state.zoomedIn()) {
+    //        // only scale the map center coordinate if we zoomed in
+    //        m_map_center = QPoint(m_map_center.x() * 2, m_map_center.y() * 2);
+    //    }
+    //} else if (event->buttons() & Qt::RightButton) {
+    //    // Zoom out
+    //    m_render_state.setZoom(std::max(m_render_state.zoom() - 1, m_config.min_zoom));
+    //    if (m_render_state.zoomedOut()) {
+    //        // only scale the map center coordinate if we zoomed out
+    //        m_map_center = QPoint(m_map_center.x() / 2, m_map_center.y() / 2);
+    //    }
+    //}
+    //// emit a signal to cancel outstanding tile requests since we are moving to a new
+    //// zoom level in the map. This allows the network layer to immediately start 
+    //// downloading map tiles for the current level.
+    //emit cancelRequests();
 
-    // A zoom operation changes the map center in pixel coordinates because the 
-    // center is defined within the pixel spae of a specific zoom level
-    QRect bounds(m_map_center.x() - size.width() / 2, 
-                 m_map_center.y() - size.height() / 2, size.width(), size.height());
+    //// A zoom operation changes the map center in pixel coordinates because the 
+    //// center is defined within the pixel spae of a specific zoom level
+    //QRect bounds(m_map_center.x() - size.width() / 2, 
+    //             m_map_center.y() - size.height() / 2, size.width(), size.height());
 
-    m_render_state.setBounds(bounds);
-    m_renderer->setState(m_render_state);
+    //m_render_state.setBounds(bounds);
+    //m_renderer->setState(m_render_state);
 }
 
 void MapViewer::keyPressEvent(QKeyEvent *event)

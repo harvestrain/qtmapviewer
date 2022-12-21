@@ -56,6 +56,7 @@ void TileFetcher::loadTile(QNetworkReply* reply)
     m_replies.erase(it);
 
     TileImage *tile = NULL;
+    QByteArray image_data;
     if (QNetworkReply::NoError != reply->error()) {
         tile = new TileImage(index);//tile.valid = false;
         if (reply->error() != QNetworkReply::OperationCanceledError) {
@@ -71,10 +72,11 @@ void TileFetcher::loadTile(QNetworkReply* reply)
 
 		/*tile = new TileImage(index, image);
 		m_images[index] = tile;*/
+        image_data = reply->readAll();
     }
     // emit the tile to the TileRenderer
     //emit responseTile(tile);
-    emit responseTile(index, reply->readAll());
+    emit responseTile(index, image_data);
 }
 
 void TileFetcher::deleteTile(TileImage* tile)
